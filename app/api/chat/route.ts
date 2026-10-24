@@ -14,7 +14,7 @@ function jsonError(status: number, error: string) {
 
 export async function POST(req: Request) {
   const apiKey = process.env.GROQ_API_KEY;
-  const model = process.env.LLM_MODEL || "llama-3.3-70b-versatile";
+  const model = process.env.LLM_MODEL || "openai/gpt-oss-120b";
   if (!apiKey) {
     return jsonError(500, "GROQ_API_KEY is not configured. Add it to .env.local (or your host's environment variables) and restart.");
   }
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
     upstream = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "content-type": "application/json" },
-      body: JSON.stringify({ model, max_tokens: 400, temperature: 0.8, messages: [{ role: "system", content: system }, ...messages] }),
+      body: JSON.stringify({ model, max_tokens: 1200, temperature: 0.8, reasoning_effort: "low", messages: [{ role: "system", content: system }, ...messages] }),
     });
   } catch {
     return jsonError(502, "Could not reach the language model. Try again.");
