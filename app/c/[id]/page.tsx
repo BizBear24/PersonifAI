@@ -14,7 +14,21 @@ export default function Chat() {
   const [error, setError] = useState<string | null>(null);
   const [speaking, setSpeaking] = useState<string | null>(null);
   const [voiceErr, setVoiceErr] = useState<Record<string, string>>({});
+  const [lang, setLang] = useState<"en" | "hi">("en");
   const loaded = useRef(false);
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem("tonecraft.lang") === "hi") setLang("hi");
+    } catch {}
+  }, []);
+
+  function pickLang(l: "en" | "hi") {
+    setLang(l);
+    try {
+      localStorage.setItem("tonecraft.lang", l);
+    } catch {}
+  }
   const bottom = useRef<HTMLDivElement>(null);
   const audio = useRef<HTMLAudioElement | null>(null);
   const cache = useRef<Record<string, string>>({});
@@ -56,6 +70,7 @@ export default function Chat() {
           name: char.name,
           description: char.description,
           backstory: char.backstory,
+          language: lang,
           messages: next.map(({ role, content }) => ({ role, content })),
         }),
       });
@@ -123,6 +138,18 @@ export default function Chat() {
           </div>
         </div>
         <div className="flex shrink-0 gap-2 font-mono text-[10px] uppercase tracking-widest">
+          <div className="flex border border-line" role="group" aria-label="Reply language">
+            {(["en", "hi"] as const).map((l) => (
+              <button
+                key={l}
+                onClick={() => pickLang(l)}
+                aria-pressed={lang === l}
+                className={`px-2.5 py-1.5 transition ${lang === l ? "bg-accent text-ink" : "text-mute hover:text-accent"}`}
+              >
+                {l === "en" ? "EN" : "हिं"}
+              </button>
+            ))}
+          </div>
           <Link href={`/edit/${char.id}`} className="border border-line px-2.5 py-1.5 text-mute transition hover:border-accent hover:text-accent">Edit</Link>
           <button
             onClick={() => {

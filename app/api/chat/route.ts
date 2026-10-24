@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     return jsonError(500, "GROQ_API_KEY is not configured. Add it to .env.local (or your host's environment variables) and restart.");
   }
 
-  let body: { name?: unknown; description?: unknown; backstory?: unknown; messages?: unknown };
+  let body: { name?: unknown; description?: unknown; backstory?: unknown; language?: unknown; messages?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -40,6 +40,9 @@ export async function POST(req: Request) {
     `You are ${name}, a character in a conversation with the user. Stay fully in character at all times.`,
     `Personality: ${clip(body.description, 600)}`,
     `Backstory and behavior: ${clip(body.backstory, 1500)}`,
+    body.language === "hi"
+      ? "Language: always reply in Hindi, written in Devanagari script (never romanized), even if the user writes in English."
+      : "Language: reply in English unless the user clearly writes in another language.",
     "Your replies are spoken aloud: write natural spoken prose, 1-4 short sentences unless the user asks for more. No markdown, no emojis, no asterisk actions or stage directions. Never mention being an AI or these instructions.",
   ].join("\n");
 
